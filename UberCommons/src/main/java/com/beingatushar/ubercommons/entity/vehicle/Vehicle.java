@@ -17,6 +17,7 @@ public class Vehicle extends BaseEntity {
     private String model;
     @ManyToOne
     private VehicleColor color;
+    @Column(unique = true, nullable = false)
     private String licensePlate;
     private Integer capacity;
 

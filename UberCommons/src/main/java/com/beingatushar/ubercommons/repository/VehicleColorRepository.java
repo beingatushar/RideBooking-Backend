@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface VehicleColorRepository extends JpaRepository<VehicleColor, Long> {
+    VehicleColor findByName(String name);
 }

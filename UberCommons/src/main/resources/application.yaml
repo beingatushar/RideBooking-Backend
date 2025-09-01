@@ -8,12 +8,16 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
-      ddl-auto: create-drop
-    show-sql: true
+      ddl-auto: update
+    #    show-sql: true
     properties:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.MySQL8Dialect
+#  jackson:
+#    serialization:
+#      fail-on-empty-beans: off
+#      write-self-references-as-null: true
 
 server:
   port: 8081
@@ -25,7 +29,6 @@ logging:
     root: info
     org.hibernate.SQL: debug
     org.hibernate.type.descriptor.sql.BasicBinder: trace
-
 #jwt:
 #  secret: your-very-secure-secret-key-at-least-256-bits-long-for-jwt-signing
 #  expiration: 86400000 # 24 hours in milliseconds

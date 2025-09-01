@@ -12,7 +12,7 @@ import lombok.*;
 @Setter
 @Getter
 @Entity
-@Table(name = "vehicle-colors")
+@Table(name = "vehicle_colors")
 public class VehicleColor extends BaseEntity {
     @Column(unique = true, nullable = false)
     private String name;

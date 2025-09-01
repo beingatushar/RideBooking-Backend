@@ -27,14 +27,14 @@ public class Booking extends BaseEntity {
     @JoinColumn(nullable = false)
     private Driver driver;
 
-    @ManyToOne
-//    @JoinColumn(nullable = false)
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(nullable = false)
     private Location pickupLocation;
-    @ManyToOne
-//    @JoinColumn(nullable = false)
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(nullable = false)
     private Location dropOffLocation;
 
-    @OneToOne(mappedBy = "booking")
+    @OneToOne(mappedBy = "booking", cascade = CascadeType.ALL)
     private LiveLocation liveLocation;
 
     @Enumerated(EnumType.STRING)

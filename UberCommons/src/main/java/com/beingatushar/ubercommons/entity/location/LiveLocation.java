@@ -1,6 +1,7 @@
 package com.beingatushar.ubercommons.entity.location;
 
 import com.beingatushar.ubercommons.entity.booking.Booking;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrimaryKeyJoinColumn;
@@ -15,5 +16,6 @@ import lombok.Setter;
 @PrimaryKeyJoinColumn(name = "id")
 public class LiveLocation extends Location {
     @OneToOne
+    @JsonIgnoreProperties("liveLocation")
     private Booking booking;
 }

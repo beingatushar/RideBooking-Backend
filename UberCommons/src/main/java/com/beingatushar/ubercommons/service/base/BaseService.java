@@ -1,4 +1,4 @@
-package com.beingatushar.ubercommons.service;
+package com.beingatushar.ubercommons.service.base;
 
 import java.util.List;
 

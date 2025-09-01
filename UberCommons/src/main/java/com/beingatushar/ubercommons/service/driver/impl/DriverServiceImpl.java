@@ -4,6 +4,7 @@ import com.beingatushar.ubercommons.entity.driver.Driver;
 import com.beingatushar.ubercommons.exception.ResourceNotFoundException;
 import com.beingatushar.ubercommons.repository.DriverRepository;
 import com.beingatushar.ubercommons.service.driver.DriverService;
+import com.beingatushar.ubercommons.service.vehicle.VehicleService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
@@ -13,13 +14,16 @@ import java.util.List;
 public class DriverServiceImpl implements DriverService {
     //    @Autowired
     private final DriverRepository driverRepository;
+    private final VehicleService vehicleService;
 
-    DriverServiceImpl(DriverRepository driverRepository) {
+    DriverServiceImpl(DriverRepository driverRepository, VehicleService vehicleService) {
         this.driverRepository = driverRepository;
+        this.vehicleService = vehicleService;
     }
 
     @Override
     public Driver create(Driver driver) {
+        vehicleService.createOrFind(driver.getVehicle());
         return driverRepository.save(driver);
     }
 
@@ -53,5 +57,10 @@ public class DriverServiceImpl implements DriverService {
     @Override
     public boolean existsById(Long id) {
         return driverRepository.existsById(id);
+    }
+
+    @Override
+    public Driver getByRef(Long id) {
+        return driverRepository.getReferenceById(id);
     }
 }

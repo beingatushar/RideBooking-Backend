@@ -2,7 +2,7 @@ package com.beingatushar.ubercommons.controller.user;
 
 import com.beingatushar.ubercommons.controller.BaseRestController;
 import com.beingatushar.ubercommons.entity.user.User;
-import com.beingatushar.ubercommons.service.BaseService;
+import com.beingatushar.ubercommons.service.base.BaseService;
 import com.beingatushar.ubercommons.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

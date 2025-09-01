@@ -2,7 +2,7 @@ package com.beingatushar.ubercommons.controller.booking;
 
 import com.beingatushar.ubercommons.controller.BaseRestController;
 import com.beingatushar.ubercommons.entity.booking.Booking;
-import com.beingatushar.ubercommons.service.BaseService;
+import com.beingatushar.ubercommons.service.base.BaseService;
 import com.beingatushar.ubercommons.service.booking.BookingService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -3,10 +3,7 @@ package com.beingatushar.ubercommons.entity.review;
 import com.beingatushar.ubercommons.entity.BaseEntity;
 import com.beingatushar.ubercommons.entity.booking.Booking;
 import com.beingatushar.ubercommons.entity.user.User;
-import jakarta.persistence.Entity;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 
 @Builder
@@ -20,11 +17,9 @@ public class Review extends BaseEntity {
     private String comment;
     private Integer rating;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     private Booking booking;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private User user;
-
-
 }

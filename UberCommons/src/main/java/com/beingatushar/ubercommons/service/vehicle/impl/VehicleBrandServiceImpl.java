@@ -4,6 +4,7 @@ import com.beingatushar.ubercommons.entity.vehicle.VehicleBrand;
 import com.beingatushar.ubercommons.exception.ResourceNotFoundException;
 import com.beingatushar.ubercommons.repository.VehicleBrandRepository;
 import com.beingatushar.ubercommons.service.vehicle.VehicleBrandService;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
@@ -19,11 +20,13 @@ public class VehicleBrandServiceImpl implements VehicleBrandService {
     }
 
     @Override
+    @Transactional
     public VehicleBrand create(VehicleBrand vehicleBrand) {
         return vehicleBrandRepository.save(vehicleBrand);
     }
 
     @Override
+    @Transactional
     public VehicleBrand update(Long id, VehicleBrand vehicleBrand) {
         VehicleBrand vehicleBrandToUpdate = getById(id);
         BeanUtils.copyProperties(vehicleBrand, vehicleBrandToUpdate);
@@ -37,6 +40,7 @@ public class VehicleBrandServiceImpl implements VehicleBrandService {
     }
 
     @Override
+    @Transactional
     public Boolean deleteById(Long id) {
         if (!existsById(id)) {
             return false;
@@ -53,5 +57,21 @@ public class VehicleBrandServiceImpl implements VehicleBrandService {
     @Override
     public boolean existsById(Long id) {
         return vehicleBrandRepository.existsById(id);
+    }
+
+    @Override
+    @Transactional
+    public VehicleBrand createOrFind(VehicleBrand vehicleBrand) {
+        if (vehicleBrand == null) {
+            throw new IllegalArgumentException("VehicleBrand cannot be null");
+        }
+        if (vehicleBrand.getId() != null) {
+            return vehicleBrandRepository.getReferenceById(vehicleBrand.getId());
+        }
+        VehicleBrand vehicleBrandByName = vehicleBrandRepository.findByName(vehicleBrand.getName());
+        if (vehicleBrandByName != null) {
+            return vehicleBrandByName;
+        }
+        return create(vehicleBrand);
     }
 }

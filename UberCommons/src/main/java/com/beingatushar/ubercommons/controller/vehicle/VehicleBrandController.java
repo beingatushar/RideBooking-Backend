@@ -2,7 +2,7 @@ package com.beingatushar.ubercommons.controller.vehicle;
 
 import com.beingatushar.ubercommons.controller.BaseRestController;
 import com.beingatushar.ubercommons.entity.vehicle.VehicleBrand;
-import com.beingatushar.ubercommons.service.BaseService;
+import com.beingatushar.ubercommons.service.base.BaseService;
 import com.beingatushar.ubercommons.service.vehicle.VehicleBrandService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

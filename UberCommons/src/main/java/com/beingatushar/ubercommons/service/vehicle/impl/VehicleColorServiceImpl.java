@@ -4,6 +4,7 @@ import com.beingatushar.ubercommons.entity.vehicle.VehicleColor;
 import com.beingatushar.ubercommons.exception.ResourceNotFoundException;
 import com.beingatushar.ubercommons.repository.VehicleColorRepository;
 import com.beingatushar.ubercommons.service.vehicle.VehicleColorService;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
@@ -19,11 +20,13 @@ public class VehicleColorServiceImpl implements VehicleColorService {
     }
 
     @Override
+    @Transactional
     public VehicleColor create(VehicleColor vehicleColor) {
         return vehicleColorRepository.save(vehicleColor);
     }
 
     @Override
+    @Transactional
     public VehicleColor update(Long id, VehicleColor vehicleColor) {
         VehicleColor vehicleColorToUpdate = getById(id);
         BeanUtils.copyProperties(vehicleColor, vehicleColorToUpdate);
@@ -37,6 +40,7 @@ public class VehicleColorServiceImpl implements VehicleColorService {
     }
 
     @Override
+    @Transactional
     public Boolean deleteById(Long id) {
         if (!existsById(id)) {
             return false;
@@ -53,5 +57,21 @@ public class VehicleColorServiceImpl implements VehicleColorService {
     @Override
     public boolean existsById(Long id) {
         return vehicleColorRepository.existsById(id);
+    }
+
+    @Override
+    @Transactional
+    public VehicleColor createOrFind(VehicleColor vehicleColor) {
+        if (vehicleColor == null)
+            throw new IllegalArgumentException("VehicleColor cannot be null");
+        if (vehicleColor.getId() != null) {
+            return vehicleColorRepository.getReferenceById(vehicleColor.getId());
+        }
+        System.out.printf("Creating vehicleColor with name %s", vehicleColor.getName());
+        VehicleColor vehicleColorByName = vehicleColorRepository.findByName(vehicleColor.getName());
+        if (vehicleColorByName != null) {
+            return vehicleColorByName;
+        }
+        return create(vehicleColor);
     }
 }
