@@ -1,5 +1,6 @@
 package com.beingatushar.ubercommons.entity.vehicle;
 
+import com.beingatushar.ubercommons.dto.VehicleBrandDTO;
 import com.beingatushar.ubercommons.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -16,4 +17,8 @@ import lombok.*;
 public class VehicleBrand extends BaseEntity {
     @Column(unique = true, nullable = false)
     private String name;
+
+    public static VehicleBrandDTO toDTO(VehicleBrand vehicleBrand) {
+        return new VehicleBrandDTO(vehicleBrand.getId(), vehicleBrand.getName());
+    }
 }
