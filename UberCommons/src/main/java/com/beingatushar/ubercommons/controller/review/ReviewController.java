@@ -1,49 +1,50 @@
 package com.beingatushar.ubercommons.controller.review;
 
-import com.beingatushar.ubercommons.controller.BaseRestController;
-import com.beingatushar.ubercommons.entity.review.Review;
+import com.beingatushar.ubercommons.dto.ReviewDTO;
 import com.beingatushar.ubercommons.service.review.ReviewService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 
 @RestController
 @RequestMapping("/reviews")
-public class ReviewController extends BaseRestController<Review, Long> {
+public class ReviewController {
     private final ReviewService reviewService;
 
     ReviewController(ReviewService reviewService) {
         this.reviewService = reviewService;
     }
 
-    @Override
-    protected ReviewService getService() {
-        return reviewService;
-    }
-
     @PostMapping
-    ResponseEntity<Review> createReview(@RequestBody Review review) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(create(review));
+    public ResponseEntity<ReviewDTO> createReview(@Valid @RequestBody ReviewDTO reviewDTO) {
+        ReviewDTO createdReview = reviewService.create(reviewDTO);
+        return new ResponseEntity<>(createdReview, HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")
-    ResponseEntity<Review> getReviewById(@PathVariable Long id) {
-        return ResponseEntity.ok(getById(id));
+    public ResponseEntity<ReviewDTO> getReviewById(@PathVariable Long id) {
+        ReviewDTO review = reviewService.getById(id);
+        return ResponseEntity.ok(review);
     }
 
     @GetMapping
-    ResponseEntity<Iterable<Review>> getAllReviews() {
-        return ResponseEntity.ok(getAll());
+    public ResponseEntity<List<ReviewDTO>> getAllReviews() {
+        List<ReviewDTO> reviews = reviewService.getAll();
+        return ResponseEntity.ok(reviews);
     }
 
     @PutMapping("/{id}")
-    ResponseEntity<Review> updateReview(@PathVariable Long id, @RequestBody Review review) {
-        return ResponseEntity.ok(update(id, review));
+    public ResponseEntity<ReviewDTO> updateReview(@PathVariable Long id, @Valid @RequestBody ReviewDTO reviewDTO) {
+        ReviewDTO updatedReview = reviewService.update(id, reviewDTO);
+        return ResponseEntity.ok(updatedReview);
     }
 
     @DeleteMapping("/{id}")
-    ResponseEntity<Boolean> deleteReview(@PathVariable Long id) {
-        return ResponseEntity.ok(deleteById(id));
+    public ResponseEntity<Void> deleteReview(@PathVariable Long id) {
+        reviewService.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 }

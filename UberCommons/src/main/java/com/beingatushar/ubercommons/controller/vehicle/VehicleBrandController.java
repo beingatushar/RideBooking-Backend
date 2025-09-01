@@ -1,9 +1,8 @@
 package com.beingatushar.ubercommons.controller.vehicle;
 
-import com.beingatushar.ubercommons.controller.BaseRestController;
-import com.beingatushar.ubercommons.entity.vehicle.VehicleBrand;
-import com.beingatushar.ubercommons.service.base.BaseService;
+import com.beingatushar.ubercommons.dto.VehicleBrandDTO;
 import com.beingatushar.ubercommons.service.vehicle.VehicleBrandService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,7 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/vehicle-brands")
-public class VehicleBrandController extends BaseRestController<VehicleBrand, Long> {
+public class VehicleBrandController {
 
     private final VehicleBrandService vehicleBrandService;
 
@@ -20,33 +19,33 @@ public class VehicleBrandController extends BaseRestController<VehicleBrand, Lon
         this.vehicleBrandService = vehicleBrandService;
     }
 
-    @Override
-    protected BaseService<VehicleBrand, Long> getService() {
-        return vehicleBrandService;
-    }
-
     @PostMapping
-    public ResponseEntity<VehicleBrand> createVehicleBrand(@RequestBody VehicleBrand vehicleBrand) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(create(vehicleBrand));
+    public ResponseEntity<VehicleBrandDTO> createVehicleBrand(@Valid @RequestBody VehicleBrandDTO vehicleBrandDTO) {
+        VehicleBrandDTO createdBrand = vehicleBrandService.create(vehicleBrandDTO);
+        return new ResponseEntity<>(createdBrand, HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<VehicleBrand> getVehicleBrandById(@PathVariable Long id) {
-        return ResponseEntity.ok(getById(id));
+    public ResponseEntity<VehicleBrandDTO> getVehicleBrandById(@PathVariable Long id) {
+        VehicleBrandDTO brand = vehicleBrandService.getById(id);
+        return ResponseEntity.ok(brand);
     }
 
     @GetMapping
-    public ResponseEntity<List<VehicleBrand>> getAllVehicleBrands() {
-        return ResponseEntity.ok(getAll());
+    public ResponseEntity<List<VehicleBrandDTO>> getAllVehicleBrands() {
+        List<VehicleBrandDTO> brands = vehicleBrandService.getAll();
+        return ResponseEntity.ok(brands);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<VehicleBrand> updateVehicleBrand(@PathVariable Long id, @RequestBody VehicleBrand vehicleBrand) {
-        return ResponseEntity.ok(update(id, vehicleBrand));
+    public ResponseEntity<VehicleBrandDTO> updateVehicleBrand(@PathVariable Long id, @Valid @RequestBody VehicleBrandDTO vehicleBrandDTO) {
+        VehicleBrandDTO updatedBrand = vehicleBrandService.update(id, vehicleBrandDTO);
+        return ResponseEntity.ok(updatedBrand);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Boolean> deleteVehicleBrand(@PathVariable Long id) {
-        return ResponseEntity.ok(deleteById(id));
+    public ResponseEntity<Void> deleteVehicleBrand(@PathVariable Long id) {
+        vehicleBrandService.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 }

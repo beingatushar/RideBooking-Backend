@@ -1,14 +1,17 @@
 package com.beingatushar.ubercommons.service.vehicle.impl;
 
+import com.beingatushar.ubercommons.dto.VehicleBrandDTO;
 import com.beingatushar.ubercommons.entity.vehicle.VehicleBrand;
 import com.beingatushar.ubercommons.exception.ResourceNotFoundException;
+import com.beingatushar.ubercommons.mapper.VehicleMapper;
 import com.beingatushar.ubercommons.repository.VehicleBrandRepository;
 import com.beingatushar.ubercommons.service.vehicle.VehicleBrandService;
-import jakarta.transaction.Transactional;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class VehicleBrandServiceImpl implements VehicleBrandService {
@@ -21,22 +24,29 @@ public class VehicleBrandServiceImpl implements VehicleBrandService {
 
     @Override
     @Transactional
-    public VehicleBrand create(VehicleBrand vehicleBrand) {
-        return vehicleBrandRepository.save(vehicleBrand);
+    public VehicleBrandDTO create(VehicleBrandDTO vehicleBrandDTO) {
+        VehicleBrand vehicleBrand = VehicleMapper.toEntity(vehicleBrandDTO);
+        VehicleBrand savedVehicleBrand = vehicleBrandRepository.save(vehicleBrand);
+        return VehicleMapper.toDTO(savedVehicleBrand);
     }
 
     @Override
     @Transactional
-    public VehicleBrand update(Long id, VehicleBrand vehicleBrand) {
-        VehicleBrand vehicleBrandToUpdate = getById(id);
-        BeanUtils.copyProperties(vehicleBrand, vehicleBrandToUpdate);
-        return vehicleBrandRepository.save(vehicleBrandToUpdate);
+    public VehicleBrandDTO update(Long id, VehicleBrandDTO vehicleBrandDTO) {
+        VehicleBrand vehicleBrandToUpdate = vehicleBrandRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("VehicleBrand with id " + id + " not found"));
+
+        vehicleBrandToUpdate.setName(vehicleBrandDTO.getName());
+
+        VehicleBrand updatedVehicleBrand = vehicleBrandRepository.save(vehicleBrandToUpdate);
+        return VehicleMapper.toDTO(updatedVehicleBrand);
     }
 
     @Override
-    public VehicleBrand getById(Long id) {
-        return vehicleBrandRepository.findById(id).orElseThrow(() ->
-                new ResourceNotFoundException("VehicleBrand with id " + id + " not found"));
+    public VehicleBrandDTO getById(Long id) {
+        VehicleBrand vehicleBrand = vehicleBrandRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("VehicleBrand with id " + id + " not found"));
+        return VehicleMapper.toDTO(vehicleBrand);
     }
 
     @Override
@@ -50,8 +60,11 @@ public class VehicleBrandServiceImpl implements VehicleBrandService {
     }
 
     @Override
-    public List<VehicleBrand> getAll() {
-        return vehicleBrandRepository.findAll();
+    public List<VehicleBrandDTO> getAll() {
+        return vehicleBrandRepository.findAll()
+                .stream()
+                .map(VehicleMapper::toDTO)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -60,18 +73,23 @@ public class VehicleBrandServiceImpl implements VehicleBrandService {
     }
 
     @Override
-    @Transactional
+    public VehicleBrand getByRef(Long id) {
+        return vehicleBrandRepository.getReferenceById(id);
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public VehicleBrand createOrFind(VehicleBrand vehicleBrand) {
-        if (vehicleBrand == null) {
-            throw new IllegalArgumentException("VehicleBrand cannot be null");
+        if (vehicleBrand == null || vehicleBrand.getName() == null || vehicleBrand.getName().isBlank()) {
+            throw new IllegalArgumentException("VehicleBrand and its name cannot be null or blank");
         }
+
         if (vehicleBrand.getId() != null) {
-            return vehicleBrandRepository.getReferenceById(vehicleBrand.getId());
+            return getByRef(vehicleBrand.getId());
         }
-        VehicleBrand vehicleBrandByName = vehicleBrandRepository.findByName(vehicleBrand.getName());
-        if (vehicleBrandByName != null) {
-            return vehicleBrandByName;
-        }
-        return create(vehicleBrand);
+
+        // Use Optional for safer handling of nulls
+        return vehicleBrandRepository.findByName(vehicleBrand.getName())
+                .orElseGet(() -> vehicleBrandRepository.save(vehicleBrand));
     }
 }

@@ -1,6 +1,5 @@
 package com.beingatushar.ubercommons.entity.vehicle;
 
-import com.beingatushar.ubercommons.dto.VehicleColorDTO;
 import com.beingatushar.ubercommons.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -17,8 +16,4 @@ import lombok.*;
 public class VehicleColor extends BaseEntity {
     @Column(unique = true, nullable = false)
     private String name;
-
-    public static VehicleColorDTO toDTO(VehicleColor vehicleColor) {
-        return new VehicleColorDTO(vehicleColor.getId(), vehicleColor.getName());
-    }
 }

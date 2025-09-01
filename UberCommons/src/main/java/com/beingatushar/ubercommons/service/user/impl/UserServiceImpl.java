@@ -1,14 +1,16 @@
 package com.beingatushar.ubercommons.service.user.impl;
 
+import com.beingatushar.ubercommons.dto.UserDTO;
 import com.beingatushar.ubercommons.entity.user.User;
 import com.beingatushar.ubercommons.exception.ResourceNotFoundException;
+import com.beingatushar.ubercommons.mapper.UserMapper;
 import com.beingatushar.ubercommons.repository.UserRepository;
 import com.beingatushar.ubercommons.service.user.UserService;
-import jakarta.transaction.Transactional;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -20,22 +22,39 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public User create(User user) {
-        return userRepository.save(user);
+    public UserDTO create(UserDTO userDTO) {
+        User user = UserMapper.toEntity(userDTO);
+        // Remember to hash the password here in a real application
+        // user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+        User savedUser = userRepository.save(user);
+        return UserMapper.toDTO(savedUser);
     }
 
     @Override
     @Transactional
-    public User update(Long id, User user) {
-        User userToUpdate = getById(id);
-        BeanUtils.copyProperties(user, userToUpdate);
-        return userRepository.save(userToUpdate);
+    public UserDTO update(Long id, UserDTO userDTO) {
+        User userToUpdate = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User with id " + id + " not found"));
+
+        // Safe, manual mapping of fields
+        userToUpdate.setName(userDTO.getName());
+        userToUpdate.setEmail(userDTO.getEmail());
+
+        // Only update the password if a new one is provided
+        if (userDTO.getPassword() != null && !userDTO.getPassword().isBlank()) {
+            // Hash the password before saving
+            userToUpdate.setPassword(userDTO.getPassword());
+        }
+
+        User updatedUser = userRepository.save(userToUpdate);
+        return UserMapper.toDTO(updatedUser);
     }
 
     @Override
-    public User getById(Long id) {
-        return userRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException("User with id " + id + " not found"));
+    public UserDTO getById(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User with id " + id + " not found"));
+        return UserMapper.toDTO(user);
     }
 
     @Override
@@ -49,8 +68,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> getAll() {
-        return userRepository.findAll();
+    public List<UserDTO> getAll() {
+        return userRepository.findAll()
+                .stream()
+                .map(UserMapper::toDTO)
+                .collect(Collectors.toList());
     }
 
     @Override

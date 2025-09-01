@@ -1,14 +1,17 @@
 package com.beingatushar.ubercommons.service.vehicle.impl;
 
+import com.beingatushar.ubercommons.dto.VehicleColorDTO;
 import com.beingatushar.ubercommons.entity.vehicle.VehicleColor;
 import com.beingatushar.ubercommons.exception.ResourceNotFoundException;
+import com.beingatushar.ubercommons.mapper.VehicleMapper;
 import com.beingatushar.ubercommons.repository.VehicleColorRepository;
 import com.beingatushar.ubercommons.service.vehicle.VehicleColorService;
-import jakarta.transaction.Transactional;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class VehicleColorServiceImpl implements VehicleColorService {
@@ -21,22 +24,29 @@ public class VehicleColorServiceImpl implements VehicleColorService {
 
     @Override
     @Transactional
-    public VehicleColor create(VehicleColor vehicleColor) {
-        return vehicleColorRepository.save(vehicleColor);
+    public VehicleColorDTO create(VehicleColorDTO vehicleColorDTO) {
+        VehicleColor vehicleColor = VehicleMapper.toEntity(vehicleColorDTO);
+        VehicleColor savedVehicleColor = vehicleColorRepository.save(vehicleColor);
+        return VehicleMapper.toDTO(savedVehicleColor);
     }
 
     @Override
     @Transactional
-    public VehicleColor update(Long id, VehicleColor vehicleColor) {
-        VehicleColor vehicleColorToUpdate = getById(id);
-        BeanUtils.copyProperties(vehicleColor, vehicleColorToUpdate);
-        return vehicleColorRepository.save(vehicleColorToUpdate);
+    public VehicleColorDTO update(Long id, VehicleColorDTO vehicleColorDTO) {
+        VehicleColor vehicleColorToUpdate = vehicleColorRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("VehicleColor with id " + id + " not found"));
+
+        vehicleColorToUpdate.setName(vehicleColorDTO.getName());
+
+        VehicleColor updatedVehicleColor = vehicleColorRepository.save(vehicleColorToUpdate);
+        return VehicleMapper.toDTO(updatedVehicleColor);
     }
 
     @Override
-    public VehicleColor getById(Long id) {
-        return vehicleColorRepository.findById(id).orElseThrow(() ->
-                new ResourceNotFoundException("VehicleColor with id " + id + " not found"));
+    public VehicleColorDTO getById(Long id) {
+        VehicleColor vehicleColor = vehicleColorRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("VehicleColor with id " + id + " not found"));
+        return VehicleMapper.toDTO(vehicleColor);
     }
 
     @Override
@@ -50,8 +60,11 @@ public class VehicleColorServiceImpl implements VehicleColorService {
     }
 
     @Override
-    public List<VehicleColor> getAll() {
-        return vehicleColorRepository.findAll();
+    public List<VehicleColorDTO> getAll() {
+        return vehicleColorRepository.findAll()
+                .stream()
+                .map(VehicleMapper::toDTO)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -60,18 +73,22 @@ public class VehicleColorServiceImpl implements VehicleColorService {
     }
 
     @Override
-    @Transactional
+    public VehicleColor getByRef(Long id) {
+        return vehicleColorRepository.getReferenceById(id);
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public VehicleColor createOrFind(VehicleColor vehicleColor) {
-        if (vehicleColor == null)
-            throw new IllegalArgumentException("VehicleColor cannot be null");
+        if (vehicleColor == null || vehicleColor.getName() == null || vehicleColor.getName().isBlank()) {
+            throw new IllegalArgumentException("VehicleColor and its name cannot be null or blank");
+        }
+
         if (vehicleColor.getId() != null) {
-            return vehicleColorRepository.getReferenceById(vehicleColor.getId());
+            return getByRef(vehicleColor.getId());
         }
-        System.out.printf("Creating vehicleColor with name %s", vehicleColor.getName());
-        VehicleColor vehicleColorByName = vehicleColorRepository.findByName(vehicleColor.getName());
-        if (vehicleColorByName != null) {
-            return vehicleColorByName;
-        }
-        return create(vehicleColor);
+
+        return vehicleColorRepository.findByName(vehicleColor.getName())
+                .orElseGet(() -> vehicleColorRepository.save(vehicleColor));
     }
 }

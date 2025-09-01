@@ -1,9 +1,8 @@
 package com.beingatushar.ubercommons.controller.vehicle;
 
-import com.beingatushar.ubercommons.controller.BaseRestController;
-import com.beingatushar.ubercommons.entity.vehicle.Vehicle;
-import com.beingatushar.ubercommons.service.base.BaseService;
+import com.beingatushar.ubercommons.dto.VehicleDTO;
 import com.beingatushar.ubercommons.service.vehicle.VehicleService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,7 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/vehicles")
-public class VehicleController extends BaseRestController<Vehicle, Long> {
+public class VehicleController {
 
     private final VehicleService vehicleService;
 
@@ -20,33 +19,28 @@ public class VehicleController extends BaseRestController<Vehicle, Long> {
         this.vehicleService = vehicleService;
     }
 
-    @Override
-    protected BaseService<Vehicle, Long> getService() {
-        return vehicleService;
-    }
-
     @PostMapping
-    public ResponseEntity<Vehicle> createVehicle(@RequestBody Vehicle vehicle) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(create(vehicle));
+    public ResponseEntity<VehicleDTO> createVehicle(@RequestBody @Valid VehicleDTO vehicle) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(vehicleService.create(vehicle));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Vehicle> getVehicleById(@PathVariable Long id) {
-        return ResponseEntity.ok(getById(id));
+    public ResponseEntity<VehicleDTO> getVehicleById(@PathVariable Long id) {
+        return ResponseEntity.ok(vehicleService.getById(id));
     }
 
     @GetMapping
-    public ResponseEntity<List<Vehicle>> getAllVehicles() {
-        return ResponseEntity.ok(getAll());
+    public ResponseEntity<List<VehicleDTO>> getAllVehicles() {
+        return ResponseEntity.ok(vehicleService.getAll().stream().toList());
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Vehicle> updateVehicle(@PathVariable Long id, @RequestBody Vehicle vehicle) {
-        return ResponseEntity.ok(update(id, vehicle));
+    public ResponseEntity<VehicleDTO> updateVehicle(@PathVariable Long id, @RequestBody @Valid VehicleDTO vehicle) {
+        return ResponseEntity.ok(vehicleService.update(id, vehicle));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Boolean> deleteVehicle(@PathVariable Long id) {
-        return ResponseEntity.ok(deleteById(id));
+        return ResponseEntity.ok(vehicleService.deleteById(id));
     }
 }

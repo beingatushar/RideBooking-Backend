@@ -1,6 +1,5 @@
 package com.beingatushar.ubercommons.entity.booking;
 
-import com.beingatushar.ubercommons.dto.BookingDTO;
 import com.beingatushar.ubercommons.entity.BaseEntity;
 import com.beingatushar.ubercommons.entity.driver.Driver;
 import com.beingatushar.ubercommons.entity.location.LiveLocation;
@@ -42,16 +41,4 @@ public class Booking extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Builder.Default
     private BookingStatus bookingStatus = BookingStatus.SCHEDULED;
-
-    public static BookingDTO toDTO(Booking booking) {
-        BookingDTO bookingDTO = new BookingDTO();
-        bookingDTO.setId(booking.getId());
-        bookingDTO.setBookingStatus(booking.getBookingStatus());
-        bookingDTO.setPickupLocation(Location.toDTO(booking.getPickupLocation()));
-        bookingDTO.setDropOffLocation(Location.toDTO(booking.getDropOffLocation()));
-//        bookingDTO.setLiveLocation(LiveLocation.toDTO(booking.getLiveLocation()));
-        bookingDTO.setDriverId(booking.getDriver().getId());
-        bookingDTO.setUserId(booking.getUser().getId());
-        return bookingDTO;
-    }
 }
